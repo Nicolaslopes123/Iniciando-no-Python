@@ -82,7 +82,7 @@ const ReportView = {
     container.querySelector('#btn-csv').addEventListener('click', () => this._exportCsv(project, materials));
   },
 
-  _exportCsv(project, materials) {
+  async _exportCsv(project, materials) {
     const header = ['Material', 'Codigo SAP', 'Qtd Necessaria', 'Qtd Disponivel', 'Status', 'Local', 'Prioridade', 'Origem', 'Referencia Externa'];
     const rows = materials.map((m) => [
       m.nome,
@@ -98,11 +98,25 @@ const ReportView = {
     const csv = [header, ...rows]
       .map((row) => row.map((cell) => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(';'))
       .join('\n');
+    const filename = `materiais-${(project.codigo || project.nome).replace(/\s+/g, '_')}.csv`;
+
+    // Dentro de um Claude Artifact, um <a download> não tem permissão para salvar
+    // arquivos; nesse caso usamos a capability "downloads" da plataforma.
+    const downloads = window.claude?.use ? await window.claude.use('downloads').catch(() => null) : null;
+    if (downloads) {
+      try {
+        await downloads.save({ filename, data: '﻿' + csv });
+      } catch (e) {
+        Utils.toast('Exportação cancelada.', 'error');
+      }
+      return;
+    }
+
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `materiais-${(project.codigo || project.nome).replace(/\s+/g, '_')}.csv`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
   },

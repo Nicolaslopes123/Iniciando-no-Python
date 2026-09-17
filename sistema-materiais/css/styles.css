@@ -233,7 +233,8 @@ textarea.input { resize: vertical; font-family: inherit; }
 .charts-grid canvas { max-height: 260px; }
 
 /* ---------- Table ---------- */
-.table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+#materials-table-wrap, .report section:has(.table) { overflow-x: auto; }
+.table { width: 100%; min-width: 640px; border-collapse: collapse; background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
 .table th, .table td { text-align: left; padding: 10px 12px; font-size: 13.5px; border-bottom: 1px solid var(--border); }
 .table th { background: var(--muted-bg); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); }
 .table tbody tr:last-child td { border-bottom: none; }
